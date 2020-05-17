@@ -141,13 +141,13 @@
             <span class="btn-wrap">
                 <input id="btn_format_pretty" type="radio" name="format" checked="true">
                 <label for="btn_format_pretty">
-                    <span class="btn" title="The selector(s) along with the starting curly brace, the ending curly brace, and each rule―all in their individual lines">Pretty</span>
+                    <span class="btn" title="The selector(s) along with the starting curly brace, the ending curly brace, and each rule―all in their individual lines.">Pretty</span>
                 </label>
             </span>
             <span class="btn-wrap">
                 <input id="btn_format_one" type="radio" name="format">
                 <label for="btn_format_one">
-                    <span class="btn" title="All rules in one line (separated by semicolons), preceded by all selectors (separated by commas) along with the strating curly brace, and followed by the ending curly brace">One-line</span>
+                    <span class="btn" title="All rules in one line (separated by semicolons), preceded by all selectors (separated by commas) along with the strating curly brace, and followed by the ending curly brace. Does not support nested scopes (e.g., media queries).">One-line (simple)</span>
                 </label>
             </span>
         </div>
@@ -162,7 +162,7 @@
     </div>
 
     <div class="footer-cont">
-        <span>v0.1.3</span>
+        <span>v0.2.0</span>
     </div>
 
 </body>
@@ -251,15 +251,19 @@
             return;
         }
 
-        if (format !== "pretty") {
+        if (format !== "pretty" && format !== "one") {
             return;
         }
 
         const css_sorted = [];
-        let block = [];
-        let is_in_block = false;
 
         lines.forEach(line => {
+
+            // Sorting mechanism for "pretty"-formated CSS.
+            if (format === "pretty") {
+
+            let block = [];
+            let is_in_block = false;
 
             // If starting line of block, add as sorted.
             if (line.split("{").length === 2) {
@@ -296,6 +300,56 @@
             // these, basically.)
             else {
                 css_sorted.push(line);
+            }
+
+            }
+
+            // Sorting mechanism for CSS with one-line rulesets (or blocks).
+            else if (format === "one") {
+
+                const has_starting_cb = line.split("{").length === 2;
+                const has_ending_cb = line.split("}").length === 2;
+                const is_block = has_starting_cb && has_ending_cb;
+
+                // Keep empty lines as is. They could be there for readability.
+                if (!line.trim()) {
+                    css_sorted.push(line);
+                }
+
+                // For complete, one-line blocks: Take rules, split using
+                // semicolons, sort, join, and recreate block.
+                else if (is_block) {
+
+                    const selector = line.split("{")[0];
+                    const rules_line = line.split("{")[1].split("}")[0];
+
+                    // Skip single-rule blocks.
+                    const rules = rules_line.split(";");
+                    const rules_sorted = rules.length === 1
+                        ? [rules_line]
+                        : rules.length === 2
+                            ? (!rules[0].trim() || !rules[1].trim())
+                                ? [rules_line]
+                                : rules.sort()
+                            : rules.sort()
+
+                    // Recreate block with sorted rules (excluding empty array
+                    // item created due to the "split()" function), and add
+                    // the selector(s) and the wrapping curly braces.
+                    const block_sorted = selector + "{" +
+                        rules_sorted.filter(rule => rule).join(";") +
+                        "}";
+
+                    css_sorted.push(block_sorted);
+
+                }
+
+                // Remove selectors (followed with commas), comments, partial
+                // blocks, and any other non-empty line.
+                else {
+                    console.log("Error: Multi-line block or comment detected! Skipping.");
+                }
+
             }
 
         });
