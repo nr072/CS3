@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+	<title>CS3 - CSS rule sorter</title>
+	
+	<meta charset="utf-8">
+
+	<style>
+
+		* {
+			box-sizing: border-box;
+			margin: 0;
+			padding: 0;
+		}
+
+		body {
+			background: beige;
+            font-family: sans-serif;
+			font-size: 12px;
+		}
+
+        span.noscript {
+            background-color: rgba(245, 215, 0, 1);
+            box-shadow: 1px 1px 15px 42px rgba(0, 0, 0, 0.5);
+            left: 50%;
+            outline: 40px solid rgba(245, 215, 0, 1);    /* instead of padding */
+            position: fixed;
+            top: 50%;
+            transform: translateX(-50%) translateY(-50%);
+        }
+
+        span.noscript::before {
+            content: "This site is thirsty! Give it some JS...";
+        }
+        
+		a {
+			color: teal;
+			text-decoration: none;
+		}
+
+
+
+        .options-cont {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .options-cont,
+        .box-cont .box {
+            margin: 20px 4vw;
+        }
+
+        span.btn {
+            padding: 0.25rem 1rem;
+            border: 1px solid rgba(127, 127, 127);
+            transition: all 0.3s ease;
+        }
+
+        span.btn:hover {
+            background-color: rgba(80, 80, 80);
+            color: #fff;
+            cursor: pointer;
+        }
+
+        .box-cont {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .box-cont .box {
+            border: 1px solid #ccc;
+            display: inline-block;
+            font-family: monospace;
+            font-size: 0.6rem;
+            max-height: 500px;
+            min-height: 100px;
+            overflow-y: auto;
+            padding: 5px;
+            width: 46vw;
+        }
+
+        .box-cont .box:focus {
+            outline: none;
+        }
+
+        .box-cont .box.active {
+            border-color: #aaa;
+        }
+
+        @media (max-width: 576px) {
+            .box-cont {
+                display: block;
+            }
+
+            .box-cont .box {
+                display: block;
+                width: 92vw;
+            }
+        }
+
+	</style>
+
+</head>
+
+
+
+<body>
+
+	<noscript><span class="noscript"></span></noscript>
+
+    <div class="cont options-cont">
+        <div></div>
+        <div>
+            <span id="sort_btn" class="btn sort-btn">Sort</span>
+        </div>
+    </div>
+
+    <div class="cont box-cont">
+        <div id="in" class="box in" contenteditable="true"></div>
+    	<div id="out" class="box out"></div>
+    </div>
+
+</body>
+
+
+
+<script>
+
+	"use strict";
+
+    focus_box(1);
+
+    const sort_btn = document.getElementById("sort_btn");
+    sort_btn.addEventListener("click", sort_css);
+
+
+
+	function focus_box(box_num) {
+		const boxes = document.querySelectorAll(".box-cont .box");
+        if (box_num === 1) {
+            boxes[0].focus();
+            boxes[0].classList.add("active");
+            boxes[1].classList.remove("active");
+        } else if (box_num === 2) {
+            boxes[0].blur();
+            boxes[0].classList.remove("active");
+            boxes[1].classList.add("active");
+        }
+	}
+
+
+
+    function clear_output() {
+        document.getElementById("out").innerText = "";
+    }
+
+
+
+    // Works only for CSS of the following format:
+    //
+    //   selector {
+    //     property: value;
+    //     property: value;
+    //     ...
+    //   }
+    //
+    function sort_css() {
+
+        clear_output();
+
+        const in_field = document.getElementById("in");
+        const css = in_field.innerText;
+        if (!css.trim()) {
+            focus_box(1);
+            console.log("Warning: Empty input! Aborting.");
+            return;
+        }
+
+        // Do not proceed unless at least 2 rules present.
+        const lines = css.split("\n");
+        if (lines.length < 4) {
+            console.log("Warning: Insufficient number of rules! Aborting.");
+            return;
+        }
+
+        const css_sorted = [];
+        let block = [];
+        let is_in_block = false;
+
+        lines.forEach(line => {
+
+            // If starting line of block, add as sorted.
+            if (line.split("{").length === 2) {
+                is_in_block = true;
+                css_sorted.push(line);
+            }
+
+            // If ending line, sort current block and add them as sorted, and
+            // then add this line as sorted.
+            else if (line.split("}").length === 2) {
+
+                is_in_block = false;
+                const block_sorted = block.sort();
+                block = [];
+
+                // Store all non-empty rule lines.
+                block_sorted.forEach(rule => {
+                    if (rule.trim()) {
+                        css_sorted.push(rule);
+                    }
+                });
+
+                // Then add current ending line.
+                css_sorted.push(line);
+
+            }
+
+            // If in-block line, store in array to sort.
+            else if (is_in_block) {
+                block.push(line);
+            }
+
+            // Add line breaks, empty lines, and comments as sorted. (Ignore
+            // these, basically.)
+            else {
+                css_sorted.push(line);
+            }
+
+        });
+
+        // Join all sorted lines, and show as output.
+        const out_field = document.getElementById("out");
+        out_field.innerText = css_sorted.join("\n");
+
+        // Scroll up to match sorted for easier side-by-side comparison.
+        in_field.scrollTop = 0;
+
+        // Focus the output box.
+        focus_box(2);
+
+    }
+
+</script>
+
+</html>
