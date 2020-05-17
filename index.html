@@ -3,25 +3,25 @@
 
 <head>
 
-	<title>CS3 - CSS rule sorter</title>
-	
-	<meta charset="utf-8">
+    <title>CS3 - CSS rule sorter</title>
 
-	<style>
+    <meta charset="utf-8">
 
-		* {
-			box-sizing: border-box;
-			margin: 0;
-			padding: 0;
-		}
+    <style>
 
-		body {
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
             --body-color: beige;
-			background-color: var(--body-color);
+            background-color: var(--body-color);
             font-family: sans-serif;
-			font-size: 12px;
+            font-size: 12px;
             margin-bottom: 50px;
-		}
+        }
 
         span.noscript {
             background-color: rgba(245, 215, 0, 1);
@@ -37,10 +37,10 @@
             content: "This site is thirsty! Give it some JS...";
         }
         
-		a {
-			color: teal;
-			text-decoration: none;
-		}
+        a {
+            color: teal;
+            text-decoration: none;
+        }
 
 
 
@@ -126,7 +126,7 @@
             width: 100%;
         }
 
-	</style>
+    </style>
 
 </head>
 
@@ -134,7 +134,7 @@
 
 <body>
 
-	<noscript><span class="noscript"></span></noscript>
+    <noscript><span class="noscript"></span></noscript>
 
     <div class="cont options-cont">
         <div>
@@ -158,11 +158,11 @@
 
     <div class="cont box-cont">
         <div id="in" class="box in" contenteditable="true"></div>
-    	<div id="out" class="box out"></div>
+        <div id="out" class="box out"></div>
     </div>
 
     <div class="footer-cont">
-        <span>v0.2.0</span>
+        <span>v0.2.1</span>
     </div>
 
 </body>
@@ -171,7 +171,7 @@
 
 <script>
 
-	"use strict";
+    "use strict";
 
     focus_box(1);
 
@@ -180,8 +180,8 @@
 
 
 
-	function focus_box(box_num) {
-		const boxes = document.querySelectorAll(".box-cont .box");
+    function focus_box(box_num) {
+        const boxes = document.querySelectorAll(".box-cont .box");
         if (box_num === 1) {
             boxes[0].focus();
             boxes[0].classList.add("active");
@@ -191,7 +191,7 @@
             boxes[0].classList.remove("active");
             boxes[1].classList.add("active");
         }
-	}
+    }
 
 
 
@@ -262,45 +262,45 @@
             // Sorting mechanism for "pretty"-formated CSS.
             if (format === "pretty") {
 
-            let block = [];
-            let is_in_block = false;
+                let block = [];
+                let is_in_block = false;
 
-            // If starting line of block, add as sorted.
-            if (line.split("{").length === 2) {
-                is_in_block = true;
-                css_sorted.push(line);
-            }
+                // If starting line of block, add as sorted.
+                if (line.split("{").length === 2) {
+                    is_in_block = true;
+                    css_sorted.push(line);
+                }
 
-            // If ending line, sort current block and add them as sorted, and
-            // then add this line as sorted.
-            else if (line.split("}").length === 2) {
+                // If ending line, sort current block and add them as sorted, and
+                // then add this line as sorted.
+                else if (line.split("}").length === 2) {
 
-                is_in_block = false;
-                const block_sorted = block.sort();
-                block = [];
+                    is_in_block = false;
+                    const block_sorted = block.sort();
+                    block = [];
 
-                // Store all non-empty rule lines.
-                block_sorted.forEach(rule => {
-                    if (rule.trim()) {
-                        css_sorted.push(rule);
-                    }
-                });
+                    // Store all non-empty rule lines.
+                    block_sorted.forEach(rule => {
+                        if (rule.trim()) {
+                            css_sorted.push(rule);
+                        }
+                    });
 
-                // Then add current ending line.
-                css_sorted.push(line);
+                    // Then add current ending line.
+                    css_sorted.push(line);
 
-            }
+                }
 
-            // If in-block line, store in array to sort.
-            else if (is_in_block) {
-                block.push(line);
-            }
+                // If in-block line, store in array to sort.
+                else if (is_in_block) {
+                    block.push(line);
+                }
 
-            // Add line breaks, empty lines, and comments as sorted. (Ignore
-            // these, basically.)
-            else {
-                css_sorted.push(line);
-            }
+                // Add line breaks, empty lines, and comments as sorted. (Ignore
+                // these, basically.)
+                else {
+                    css_sorted.push(line);
+                }
 
             }
 
