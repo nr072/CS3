@@ -183,7 +183,7 @@
     </div>
 
     <div class="footer-cont">
-        <span>v0.3.2</span>
+        <span>v0.3.3</span>
     </div>
 
 </body>
@@ -393,12 +393,15 @@
                             : rules.sort()
 
                     // Recreate block with sorted rules (excluding empty array
-                    // item created due to the "split()" function), and add
-                    // the selector(s) and the wrapping curly braces.
+                    // item created due to the "split()" function, and trimmed
+                    // off of empty whitespaces since block is one-line), and
+                    // add the selector(s) and the wrapping curly braces.
                     const block_sorted = selector + "{" +
-                        rules_sorted.filter(rule => rule).join(";") +
-                        ";" +
-                        "}";
+                        rules_sorted
+                            .filter(rule => rule.trim())
+                            .map(rule => rule.trim())
+                            .join(";") +
+                        ";}";
 
                     css_sorted.push(block_sorted);
 
