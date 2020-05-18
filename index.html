@@ -183,7 +183,7 @@
     </div>
 
     <div class="footer-cont">
-        <span>v0.2.2</span>
+        <span>v0.2.3</span>
     </div>
 
 </body>
@@ -279,14 +279,14 @@
         const css = in_field.innerText;
         if (!css.trim()) {
             focus_box(1);
-            console.log("Warning: Empty input! Aborting.");
+            console.log("Error: Empty input! Aborting.");
             return;
         }
 
         // Do not proceed unless at least 2 rules present.
         const lines = css.split("\n");
         if (lines.length < 4) {
-            console.log("Warning: Insufficient number of rules! Aborting.");
+            console.log("Error: Insufficient number of rules! Aborting.");
             return;
         }
 
@@ -399,7 +399,7 @@
                 // Remove selectors (followed with commas), comments, partial
                 // blocks, and any other non-empty line.
                 else {
-                    console.log("Error: Multi-line block or comment detected! Skipping.");
+                    console.log("Warning: Unacceptable line detected! Removing.");
                 }
 
             }
