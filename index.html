@@ -219,7 +219,7 @@
     </div>
 
     <div class="footer-cont">
-        <span>v0.6.4</span>
+        <span>v0.6.5</span>
     </div>
 
 </body>
@@ -228,333 +228,333 @@
 
 <script>
 
-    "use strict";
+"use strict";
 
+focus_box(1);
+
+const sort_btn = document.getElementById("sort_btn");
+sort_btn.addEventListener("click", sort_css);
+
+const input_clear_btn = document.getElementById("input_clear_btn");
+input_clear_btn.addEventListener("click", function () {
+    clear_box(1);
     focus_box(1);
+});
 
-    const sort_btn = document.getElementById("sort_btn");
-    sort_btn.addEventListener("click", sort_css);
 
-    const input_clear_btn = document.getElementById("input_clear_btn");
-    input_clear_btn.addEventListener("click", function () {
-        clear_box(1);
-        focus_box(1);
+
+// Focus code input or output box.
+function focus_box(box_num) {
+    const boxes = document.querySelectorAll(".box-cont .box");
+    if (box_num === 1) {
+        boxes[0].focus();
+        boxes[0].classList.add("active");
+        boxes[1].classList.remove("active");
+    } else if (box_num === 2) {
+        boxes[0].blur();
+        boxes[0].classList.remove("active");
+        boxes[1].classList.add("active");
+    }
+}
+
+
+
+// Clear code input or output box.
+function clear_box(box_num) {
+    document.getElementById(box_num === 1 ? "in" : "out").innerText = "";
+}
+
+
+
+// Show code as numbered rows.
+function turn_into_table(code) {
+
+    if (!code || !code.length) {
+        return null;
+    }
+
+    const table = document.createElement("table");
+    table.className = "code";
+
+    // Create a number row for each line of code.
+    code.forEach((line, index) => {
+
+        const row = document.createElement("tr");
+        const cell_1 = document.createElement("td");
+        cell_1.className = "num";
+        const cell_2 = document.createElement("td");
+        cell_2.className = "code";
+
+        cell_1.innerText = index + 1;
+        cell_2.innerText = line;
+
+        row.appendChild(cell_1);
+        row.appendChild(cell_2);
+        table.appendChild(row);
+
     });
 
+    return table;
+
+}
 
 
-    // Focus code input or output box.
-    function focus_box(box_num) {
-        const boxes = document.querySelectorAll(".box-cont .box");
-        if (box_num === 1) {
-            boxes[0].focus();
-            boxes[0].classList.add("active");
-            boxes[1].classList.remove("active");
-        } else if (box_num === 2) {
-            boxes[0].blur();
-            boxes[0].classList.remove("active");
-            boxes[1].classList.add("active");
+
+// Get selected CSS format.
+function get_format() {
+    const inputs = document.getElementsByName("format");
+    for (let i = 0; i < inputs.length; ++i) {
+        if (inputs[i].checked) {
+            return inputs[i].id === "inp_format_pretty"
+                ? "pretty"
+                : inputs[i].id === "inp_format_one"
+                    ? "one"
+                    : false;
+        }
+    }
+}
+
+
+
+// Get the selected mode for the selected format.
+function get_mode(format) {
+
+    const inputs = format === "one"
+        ? document.getElementsByName("format_one")
+        : null;
+
+    if (!inputs || !inputs.length) {
+        return null;
+    }
+
+    for (let i = 0; i < inputs.length; ++i) {
+        if (inputs[i].checked) {
+            return inputs[i].id === "inp_format_one_strict"
+                ? "strict"
+                : inputs[i].id === "inp_format_one_lax"
+                    ? "lax"
+                    : null;
         }
     }
 
-
-
-    // Clear code input or output box.
-    function clear_box(box_num) {
-        document.getElementById(box_num === 1 ? "in" : "out").innerText = "";
-    }
+}
 
 
 
-    // Show code as numbered rows.
-    function turn_into_table(code) {
+// Split input on line breaks, take all lines between the two lines
+// containing the starting and the ending burly braces, sort, and join
+// to recreate ruleset block.
+function sort_pretty_formatted(lines) {
 
-        if (!code || !code.length) {
-            return null;
-        }
+    const css_sorted = [];
+    let block = [];
+    let is_in_block = false;
 
-        const table = document.createElement("table");
-        table.className = "code";
+    lines.forEach(line => {
 
-        // Create a number row for each line of code.
-        code.forEach((line, index) => {
-
-            const row = document.createElement("tr");
-            const cell_1 = document.createElement("td");
-            cell_1.className = "num";
-            const cell_2 = document.createElement("td");
-            cell_2.className = "code";
-
-            cell_1.innerText = index + 1;
-            cell_2.innerText = line;
-
-            row.appendChild(cell_1);
-            row.appendChild(cell_2);
-            table.appendChild(row);
-
-        });
-
-        return table;
-
-    }
-
-
-
-    // Get selected CSS format.
-    function get_format() {
-        const inputs = document.getElementsByName("format");
-        for (let i = 0; i < inputs.length; ++i) {
-            if (inputs[i].checked) {
-                return inputs[i].id === "inp_format_pretty"
-                    ? "pretty"
-                    : inputs[i].id === "inp_format_one"
-                        ? "one"
-                        : false;
-            }
-        }
-    }
-
-
-
-    // Get the selected mode for the selected format.
-    function get_mode(format) {
-
-        const inputs = format === "one"
-            ? document.getElementsByName("format_one")
-            : null;
-
-        if (!inputs || !inputs.length) {
-            return null;
-        }
-
-        for (let i = 0; i < inputs.length; ++i) {
-            if (inputs[i].checked) {
-                return inputs[i].id === "inp_format_one_strict"
-                    ? "strict"
-                    : inputs[i].id === "inp_format_one_lax"
-                        ? "lax"
-                        : null;
-            }
-        }
-
-    }
-
-
-
-    // Split input on line breaks, take all lines between the two lines
-    // containing the starting and the ending burly braces, sort, and join
-    // to recreate ruleset block.
-    function sort_pretty_formatted(lines) {
-
-        const css_sorted = [];
-        let block = [];
-        let is_in_block = false;
-
-        lines.forEach(line => {
-
-            // If starting line of block, add as sorted.
-            if (line.split("{").length === 2) {
-                is_in_block = true;
-                css_sorted.push(line);
-            }
-
-            // If ending line, sort current block and add them as sorted, and
-            // then add this line as sorted.
-            else if (line.split("}").length === 2) {
-
-                is_in_block = false;
-                const block_sorted = block.sort();
-                block = [];
-
-                // Store all non-empty rule lines.
-                block_sorted.forEach(rule => {
-                    if (rule.trim()) {
-                        css_sorted.push(rule);
-                    }
-                });
-
-                // Then add current ending line.
-                css_sorted.push(line);
-
-            }
-
-            // If in-block line, store in array to sort.
-            else if (is_in_block) {
-                block.push(line);
-            }
-
-            // Add line breaks, empty lines, and comments as sorted. (Ignore
-            // these, basically.)
-            else {
-                css_sorted.push(line);
-            }
-
-        });
-
-        return css_sorted;
-
-    }
-
-
-
-    // Take line if it is a complete block (determined by checking if line
-    // contains only one starting and one ending curly braces), split using
-    // semicolons to separate rules, sort rules, and then join them to
-    // recreate block.
-    function sort_one_formatted(line, css_sorted, mode, index) {
-
-        // Line is considered a block if it contains only one of
-        // starting and ending curly braces each.
-        const has_starting_cb = line.split("{").length === 2;
-        const has_ending_cb = line.split("}").length === 2;
-        const is_block = has_starting_cb && has_ending_cb;
-
-        // Keep empty lines as is. They could be there for readability.
-        if (!line.trim()) {
+        // If starting line of block, add as sorted.
+        if (line.split("{").length === 2) {
+            is_in_block = true;
             css_sorted.push(line);
         }
 
-        // For complete, one-line blocks: Take rules, split using
-        // semicolons, sort, join, and recreate block.
-        else if (is_block) {
+        // If ending line, sort current block and add them as sorted, and
+        // then add this line as sorted.
+        else if (line.split("}").length === 2) {
 
-            const selector = line.split("{")[0];
-            const rules_line = line.split("{")[1].split("}")[0];
+            is_in_block = false;
+            const block_sorted = block.sort();
+            block = [];
 
-            // Skip single-rule blocks.
-            const rules = rules_line.split(";").filter(rule => rule.trim());
-            const rules_sorted = rules.length === 1
-                ? [rules[0]]
-                : rules.length === 2
-                    ? (!rules[0].trim() || !rules[1].trim())
-                        ? [rules_line]
-                        : rules.sort()
-                    : rules.sort()
-
-            // Recreate block with sorted rules (excluding empty array
-            // item created due to the "split()" function, and trimmed
-            // off of empty whitespaces since block is one-line), and
-            // add the selector(s) and the wrapping curly braces.
-            const block_sorted = selector + "{" +
-                rules_sorted
-                    .filter(rule => rule.trim())
-                    .map(rule => rule.trim())
-                    .join("; ") +
-                ";}";
-
-            css_sorted.push(block_sorted);
-
-        }
-
-        // Based on mode, either abort execution or remove selectors
-        // (followed with commas), comments, partial blocks, and any other
-        // non-empty line.
-        else {
-            if (mode === "strict") {
-                console.log("Error: Unacceptable line detected! Aborting.");
-                return [css_sorted, true];
-            } else if (mode === "lax") {
-                console.log(
-                    "Warning: Unacceptable line detected! Removing line " +
-                    (index + 1) + "."
-                );
-            }
-        }
-
-        // If "true", the second parameter tells execution to stop. This
-        // is used for Strict mode.
-        return mode === "strict" ? [css_sorted, false] : css_sorted;
-
-    }
-
-
-
-    // Take CSS code input, sort, and show as output.
-    function sort_css() {
-
-        // Clear the output box.
-        clear_box(2);
-
-        const in_field = document.getElementById("in");
-        const css = in_field.innerText;
-        if (!css.trim()) {
-            focus_box(1);
-            console.log("Error: Empty input! Aborting.");
-            return;
-        }
-
-        // Do not proceed unless at least 2 rules present.
-        const lines = css.split("\n");
-        if (lines.length < 4) {
-            console.log("Error: Insufficient number of rules! Aborting.");
-            return;
-        }
-
-        const format = get_format();
-        if (!format) {
-            console.log("Error: CSS format not selected! Aborting.");
-            return;
-        }
-
-        const mode = get_mode(format);
-        if (format === "one") {
-            if (!mode) {
-                console.log("Error: Mode not selected! Aborting.");
-                return;
-            }
-        }
-
-        let css_sorted = [];
-
-        // Sorting mechanism for "pretty"-formated CSS.
-        if (format === "pretty") {
-            css_sorted = sort_pretty_formatted(lines);
-        }
-
-        // The reason behind using "forEach" as opposed to a for-loop for
-        // this mode is "forEach" can not be broken out of. In Lax mode,
-        // the code needs to be executed for all lines, whereas in Strict
-        // mode, the execution will stop at the first unacceptable line.
-        else if (format === "one" && mode === "lax") {
-            lines.forEach((line, index) => {
-                css_sorted = sort_one_formatted(line, css_sorted, mode, index);
+            // Store all non-empty rule lines.
+            block_sorted.forEach(rule => {
+                if (rule.trim()) {
+                    css_sorted.push(rule);
+                }
             });
+
+            // Then add current ending line.
+            css_sorted.push(line);
+
         }
 
-        // Sort in Strict mode. Execution is aborted if any non-empty line
-        // that is not a complete block is found.
-        else if (format === "one" && mode === "strict") {
-            let stop = false;
-            for (let i = 0; i < lines.length && !stop; ++i) {
-                [css_sorted, stop] = sort_one_formatted(lines[i], css_sorted, mode);
-            }
+        // If in-block line, store in array to sort.
+        else if (is_in_block) {
+            block.push(line);
         }
 
-        // Show output code as numbered rows.
-        const out_table = turn_into_table(css_sorted);
-        if (!out_table) {
-            console.log("Error: Something unexpected happened! Aborting.");
-            return;
+        // Add line breaks, empty lines, and comments as sorted. (Ignore
+        // these, basically.)
+        else {
+            css_sorted.push(line);
         }
-        const out_field = document.getElementById("out");
-        out_field.appendChild(out_table);
 
-        // Clear input box, and show input code as numbered rows too.
-        const in_table = turn_into_table(lines);
-        if (!in_table) {
-            console.log("Error: Something unexpected happened! Aborting.");
-            return;
-        }
-        clear_box(1);
-        in_field.appendChild(in_table);
+    });
 
-        // Scroll up to match sorted for easier side-by-side comparison.
-        in_field.scrollTop = 0;
+    return css_sorted;
 
-        // Focus the output box.
-        focus_box(2);
+}
+
+
+
+// Take line if it is a complete block (determined by checking if line
+// contains only one starting and one ending curly braces), split using
+// semicolons to separate rules, sort rules, and then join them to
+// recreate block.
+function sort_one_formatted(line, css_sorted, mode, index) {
+
+    // Line is considered a block if it contains only one of
+    // starting and ending curly braces each.
+    const has_starting_cb = line.split("{").length === 2;
+    const has_ending_cb = line.split("}").length === 2;
+    const is_block = has_starting_cb && has_ending_cb;
+
+    // Keep empty lines as is. They could be there for readability.
+    if (!line.trim()) {
+        css_sorted.push(line);
+    }
+
+    // For complete, one-line blocks: Take rules, split using
+    // semicolons, sort, join, and recreate block.
+    else if (is_block) {
+
+        const selector = line.split("{")[0];
+        const rules_line = line.split("{")[1].split("}")[0];
+
+        // Skip single-rule blocks.
+        const rules = rules_line.split(";").filter(rule => rule.trim());
+        const rules_sorted = rules.length === 1
+            ? [rules[0]]
+            : rules.length === 2
+                ? (!rules[0].trim() || !rules[1].trim())
+                    ? [rules_line]
+                    : rules.sort()
+                : rules.sort()
+
+        // Recreate block with sorted rules (excluding empty array
+        // item created due to the "split()" function, and trimmed
+        // off of empty whitespaces since block is one-line), and
+        // add the selector(s) and the wrapping curly braces.
+        const block_sorted = selector + "{" +
+            rules_sorted
+                .filter(rule => rule.trim())
+                .map(rule => rule.trim())
+                .join("; ") +
+            ";}";
+
+        css_sorted.push(block_sorted);
 
     }
+
+    // Based on mode, either abort execution or remove selectors
+    // (followed with commas), comments, partial blocks, and any other
+    // non-empty line.
+    else {
+        if (mode === "strict") {
+            console.log("Error: Unacceptable line detected! Aborting.");
+            return [css_sorted, true];
+        } else if (mode === "lax") {
+            console.log(
+                "Warning: Unacceptable line detected! Removing line " +
+                (index + 1) + "."
+            );
+        }
+    }
+
+    // If "true", the second parameter tells execution to stop. This
+    // is used for Strict mode.
+    return mode === "strict" ? [css_sorted, false] : css_sorted;
+
+}
+
+
+
+// Take CSS code input, sort, and show as output.
+function sort_css() {
+
+    // Clear the output box.
+    clear_box(2);
+
+    const in_field = document.getElementById("in");
+    const css = in_field.innerText;
+    if (!css.trim()) {
+        focus_box(1);
+        console.log("Error: Empty input! Aborting.");
+        return;
+    }
+
+    // Do not proceed unless at least 2 rules present.
+    const lines = css.split("\n");
+    if (lines.length < 4) {
+        console.log("Error: Insufficient number of rules! Aborting.");
+        return;
+    }
+
+    const format = get_format();
+    if (!format) {
+        console.log("Error: CSS format not selected! Aborting.");
+        return;
+    }
+
+    const mode = get_mode(format);
+    if (format === "one") {
+        if (!mode) {
+            console.log("Error: Mode not selected! Aborting.");
+            return;
+        }
+    }
+
+    let css_sorted = [];
+
+    // Sorting mechanism for "pretty"-formated CSS.
+    if (format === "pretty") {
+        css_sorted = sort_pretty_formatted(lines);
+    }
+
+    // The reason behind using "forEach" as opposed to a for-loop for
+    // this mode is "forEach" can not be broken out of. In Lax mode,
+    // the code needs to be executed for all lines, whereas in Strict
+    // mode, the execution will stop at the first unacceptable line.
+    else if (format === "one" && mode === "lax") {
+        lines.forEach((line, index) => {
+            css_sorted = sort_one_formatted(line, css_sorted, mode, index);
+        });
+    }
+
+    // Sort in Strict mode. Execution is aborted if any non-empty line
+    // that is not a complete block is found.
+    else if (format === "one" && mode === "strict") {
+        let stop = false;
+        for (let i = 0; i < lines.length && !stop; ++i) {
+            [css_sorted, stop] = sort_one_formatted(lines[i], css_sorted, mode);
+        }
+    }
+
+    // Show output code as numbered rows.
+    const out_table = turn_into_table(css_sorted);
+    if (!out_table) {
+        console.log("Error: Something unexpected happened! Aborting.");
+        return;
+    }
+    const out_field = document.getElementById("out");
+    out_field.appendChild(out_table);
+
+    // Clear input box, and show input code as numbered rows too.
+    const in_table = turn_into_table(lines);
+    if (!in_table) {
+        console.log("Error: Something unexpected happened! Aborting.");
+        return;
+    }
+    clear_box(1);
+    in_field.appendChild(in_table);
+
+    // Scroll up to match sorted for easier side-by-side comparison.
+    in_field.scrollTop = 0;
+
+    // Focus the output box.
+    focus_box(2);
+
+}
 
 </script>
 
