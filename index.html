@@ -101,6 +101,11 @@
             cursor: pointer;
         }
 
+        .options-cont .copy-btn:hover {
+            background-color: #c87353;
+            border-color: #c87353;
+        }
+
         .options-cont .clear-btn:hover {
             background-color: #f2758e;
             border-color: #f2758e;
@@ -214,6 +219,7 @@
             </span>
         </div>
         <div class="btn-cont">
+            <span id="output_copy_btn" class="btn copy-btn">Copy output</span>
             <span id="input_clear_btn" class="btn clear-btn">Clear input</span>
             <span id="sort_btn" class="btn sort-btn">Sort</span>
         </div>
@@ -225,7 +231,7 @@
     </div>
 
     <div class="footer-cont">
-        <span>v0.6.9</span>
+        <span>v0.6.10</span>
     </div>
 
 </body>
@@ -235,6 +241,20 @@
 <script>
 
 "use strict";
+
+const cs3 = function () {
+    let code = "";
+    return {
+        save_code: function (text) {
+            code = text;
+        },
+        get_code: function () {
+            return code;
+        }
+    }
+}();
+
+
 
 focus_input(true);
 
@@ -246,6 +266,9 @@ input_clear_btn.addEventListener("click", function () {
     clear_box(1);
     focus_input(true);
 });
+
+const output_copy_btn = document.getElementById("output_copy_btn");
+output_copy_btn.addEventListener("click", copy_output);
 
 
 
@@ -304,6 +327,31 @@ function turn_into_table(code) {
     });
 
     return table;
+
+}
+
+
+
+// Copy output code in a usable format (not the numbered row one as seen
+// in the output box).
+function copy_output() {
+
+    // Create temporary invisible <textarea> tag.
+    const ta = document.createElement("textarea");
+    ta.id = "temp";
+    ta.style.opacity = 0;
+    ta.style.position = "fixed";
+    document.body.appendChild(ta);
+
+    // Put sorted output in it, copy, and remove <textarea>.
+    ta.value = cs3.get_code();
+    ta.focus();
+    ta.select();
+    const success = document.execCommand("copy");
+    if (!success) {
+        console.log("Error: Attempt to copy failed!");
+    }
+    ta.remove();
 
 }
 
@@ -538,6 +586,11 @@ function sort_css() {
             [css_sorted, stop] = sort_one_formatted(lines[i], css_sorted, mode);
         }
     }
+
+    // Save sorted output for copying later (if needed). This feature is
+    // provided because directly copying from the output box will include
+    // the row numbers and may mess up spacing.
+    cs3.save_code(css_sorted.join("\n"));
 
     // Show output code as numbered rows.
     const out_table = turn_into_table(css_sorted);
