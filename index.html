@@ -183,7 +183,7 @@
     </div>
 
     <div class="footer-cont">
-        <span>v0.2.5</span>
+        <span>v0.3.0</span>
     </div>
 
 </body>
@@ -266,11 +266,10 @@
     function sort_pretty_formatted(lines) {
 
         const css_sorted = [];
+        let block = [];
+        let is_in_block = false;
 
         lines.forEach(line => {
-
-            let block = [];
-            let is_in_block = false;
 
             // If starting line of block, add as sorted.
             if (line.split("{").length === 2) {
