@@ -183,7 +183,7 @@
     </div>
 
     <div class="footer-cont">
-        <span>v0.3.3</span>
+        <span>v0.3.4</span>
     </div>
 
 </body>
@@ -316,53 +316,7 @@
 
 
 
-    function sort_css() {
-
-        clear_output();
-
-        const in_field = document.getElementById("in");
-        const css = in_field.innerText;
-        if (!css.trim()) {
-            focus_box(1);
-            console.log("Error: Empty input! Aborting.");
-            return;
-        }
-
-        // Do not proceed unless at least 2 rules present.
-        const lines = css.split("\n");
-        if (lines.length < 4) {
-            console.log("Error: Insufficient number of rules! Aborting.");
-            return;
-        }
-
-        const format = get_format();
-        if (!format) {
-            console.log("Error: CSS format not selected! Aborting.");
-            return;
-        }
-
-        const mode = get_mode(format);
-        if (format === "one") {
-            if (!mode) {
-                console.log("Error: Mode not selected! Aborting.");
-                return;
-            } else if (mode === "strict") {
-                console.log("Error: Strict mode functionality not added yet! Aborting.");
-                return;
-            }
-        }
-
-        let css_sorted = [];
-
-        // Sorting mechanism for "pretty"-formated CSS.
-        if (format === "pretty") {
-            css_sorted = sort_pretty_formatted(lines);
-        }
-
-        lines.forEach(line => {
-
-            // Sorting mechanism for CSS with one-line rulesets (or blocks).
-            if (format === "one") {
+    function sort_one_formatted(line, css_sorted) {
 
                 // Line is considered a block if it contains only one of
                 // starting and ending curly braces each.
@@ -413,9 +367,65 @@
                     console.log("Warning: Unacceptable line detected! Removing.");
                 }
 
+                return css_sorted;
+
+    }
+
+
+
+    function sort_css() {
+
+        clear_output();
+
+        const in_field = document.getElementById("in");
+        const css = in_field.innerText;
+        if (!css.trim()) {
+            focus_box(1);
+            console.log("Error: Empty input! Aborting.");
+            return;
+        }
+
+        // Do not proceed unless at least 2 rules present.
+        const lines = css.split("\n");
+        if (lines.length < 4) {
+            console.log("Error: Insufficient number of rules! Aborting.");
+            return;
+        }
+
+        const format = get_format();
+        if (!format) {
+            console.log("Error: CSS format not selected! Aborting.");
+            return;
+        }
+
+        const mode = get_mode(format);
+        if (format === "one") {
+            if (!mode) {
+                console.log("Error: Mode not selected! Aborting.");
+                return;
+            } else if (mode === "strict") {
+                console.log("Error: Strict mode functionality not added yet! Aborting.");
+                return;
+            }
+        }
+
+        let css_sorted = [];
+
+        // Sorting mechanism for "pretty"-formated CSS.
+        if (format === "pretty") {
+            css_sorted = sort_pretty_formatted(lines);
+        }
+
+        // Sorting mechanism for CSS with one-line ruleset blocks.
+        if (format === "one") {
+
+            if (mode === "lax") {
+                lines.forEach(line => {
+                    css_sorted = sort_one_formatted(line, css_sorted);
+                });
             }
 
-        });
+        }
 
         // Join all sorted lines, and show as output.
         const out_field = document.getElementById("out");
