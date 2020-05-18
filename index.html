@@ -219,7 +219,7 @@
     </div>
 
     <div class="footer-cont">
-        <span>v0.6.3</span>
+        <span>v0.6.4</span>
     </div>
 
 </body>
@@ -401,7 +401,7 @@
     // contains only one starting and one ending curly braces), split using
     // semicolons to separate rules, sort rules, and then join them to
     // recreate block.
-    function sort_one_formatted(line, css_sorted, mode) {
+    function sort_one_formatted(line, css_sorted, mode, index) {
 
         // Line is considered a block if it contains only one of
         // starting and ending curly braces each.
@@ -454,7 +454,10 @@
                 console.log("Error: Unacceptable line detected! Aborting.");
                 return [css_sorted, true];
             } else if (mode === "lax") {
-                console.log("Warning: Unacceptable line detected! Removing.");
+                console.log(
+                    "Warning: Unacceptable line detected! Removing line " +
+                    (index + 1) + "."
+                );
             }
         }
 
@@ -513,8 +516,8 @@
         // the code needs to be executed for all lines, whereas in Strict
         // mode, the execution will stop at the first unacceptable line.
         else if (format === "one" && mode === "lax") {
-            lines.forEach(line => {
-                css_sorted = sort_one_formatted(line, css_sorted, mode);
+            lines.forEach((line, index) => {
+                css_sorted = sort_one_formatted(line, css_sorted, mode, index);
             });
         }
 
