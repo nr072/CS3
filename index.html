@@ -183,7 +183,7 @@
     </div>
 
     <div class="footer-cont">
-        <span>v0.3.0</span>
+        <span>v0.3.1</span>
     </div>
 
 </body>
@@ -364,6 +364,8 @@
             // Sorting mechanism for CSS with one-line rulesets (or blocks).
             if (format === "one") {
 
+                // Line is considered a block if it contains only one of
+                // starting and ending curly braces each.
                 const has_starting_cb = line.split("{").length === 2;
                 const has_ending_cb = line.split("}").length === 2;
                 const is_block = has_starting_cb && has_ending_cb;
