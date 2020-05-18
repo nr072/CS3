@@ -44,6 +44,10 @@
 
 
 
+        .hidden {
+            display: none;
+        }
+
         .options-cont {
             display: flex;
             justify-content: space-between;
@@ -54,8 +58,8 @@
             margin: 20px 4vw;
         }
 
-        .btn-wrap {
-            margin-right: 0.5rem;
+        .btn-wrap:not(.inner) {
+            margin-right: 1rem;
         }
 
         .btn-wrap input[type="radio"] {
@@ -67,10 +71,15 @@
             color: #fff;
         }
 
+        .btn-wrap input[type="radio"]:checked ~ .btn-wrap.hidden {
+            display: inline-block;
+        }
+
         span.btn {
             padding: 0.25rem 1rem;
             border: 1px solid rgba(127, 127, 127);
             transition: all 0.3s ease;
+            margin-right: 0.25rem;
         }
 
         span.btn:hover {
@@ -141,14 +150,26 @@
             <span class="btn-wrap">
                 <input id="btn_format_pretty" type="radio" name="format" checked="true">
                 <label for="btn_format_pretty">
-                    <span class="btn" title="The selector(s) along with the starting curly brace, the ending curly brace, and each rule―all in their individual lines.">Pretty</span>
+                    <span class="btn" title="The selector(s) along with the starting curly brace, the ending curly brace, and each rule must be on separate lines in the input. Multiple selectors may be present, both in separate lines and a sinlge line.">Pretty</span>
                 </label>
             </span>
             <span class="btn-wrap">
                 <input id="btn_format_one" type="radio" name="format">
                 <label for="btn_format_one">
-                    <span class="btn" title="All rules in one line (separated by semicolons), preceded by all selectors (separated by commas) along with the strating curly brace, and followed by the ending curly brace. Does not support nested scopes (e.g., media queries).">One-line (simple)</span>
+                    <span class="btn" title="All rules (separated by semicolons), preceded by all selectors (separated by commas) along with the strating curly brace, and followed by the ending curly brace must be on the same line in the input. Multiple selectors may be present but must be one the same line. Each ruleset block (inlcuding all selectors) must occupy only one line. Nested scopes (e.g., media queries) are not supported.">One-line</span>
                 </label>
+                <span class="btn-wrap inner hidden">
+                    <input id="btn_format_one_strict" type="radio" name="format_one" checked="true">
+                    <label for="btn_format_one_strict">
+                        <span class="btn" title="Strict mode (abortive): Execution is aborted if any non-empty line that is not a complete, one-line ruleset block (e.g., comments, multiple selectors placed on separate lines) is detected. Empty lines are tolerated due to consideration about readability.">Strict</span>
+                    </label>
+                </span>
+                <span class="btn-wrap inner hidden">
+                    <input id="btn_format_one_lax" type="radio" name="format_one">
+                    <label for="btn_format_one_lax">
+                        <span class="btn" title="Lax mode (exclusive): All non-empty lines that are not complete, one-line ruleset blocks (e.g., comments, multiple selectors placed on separate lines, incomplete ruleset blocks) are removed, but execution is not aborted. In case of multiple selectors on separate lines, this mode removes all but the last selector (the one on the same line as the block) providing its line contains a complete ruleset block. Empty lines are preserved.">Lax</span>
+                    </label>
+                </span>
             </span>
         </div>
         <div>
@@ -162,7 +183,7 @@
     </div>
 
     <div class="footer-cont">
-        <span>v0.2.1</span>
+        <span>v0.2.2</span>
     </div>
 
 </body>
@@ -217,6 +238,31 @@
 
 
 
+    // Get the selected mode for the selected format.
+    function get_mode(format) {
+
+        const inputs = format === "one"
+            ? document.getElementsByName("format_one")
+            : null;
+
+        if (!inputs || !inputs.length) {
+            return null;
+        }
+
+        for (let i = 0; i < inputs.length; ++i) {
+            if (inputs[i].checked) {
+                return inputs[i].id === "btn_format_one_strict"
+                    ? "strict"
+                    : inputs[i].id === "btn_format_one_lax"
+                        ? "lax"
+                        : null;
+            }
+        }
+
+    }
+
+
+
     // Works only for CSS of the following format:
     //
     //   selector {
@@ -245,13 +291,19 @@
         }
 
         const format = get_format();
-
         if (!format) {
             console.log("Error: CSS format not selected! Aborting.");
             return;
         }
 
-        if (format !== "pretty" && format !== "one") {
+        const mode = get_mode(format);
+        if (!mode) {
+            console.log("Error: Mode not selected! Aborting.");
+            return;
+        }
+
+        if (format === "one" && mode === "strict") {
+            console.log("Error: Strict node functionality not added yet! Aborting.");
             return;
         }
 
