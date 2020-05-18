@@ -183,7 +183,7 @@
     </div>
 
     <div class="footer-cont">
-        <span>v0.2.4</span>
+        <span>v0.2.5</span>
     </div>
 
 </body>
@@ -263,6 +263,60 @@
 
 
 
+    function sort_pretty_formatted(lines) {
+
+        const css_sorted = [];
+
+        lines.forEach(line => {
+
+            let block = [];
+            let is_in_block = false;
+
+            // If starting line of block, add as sorted.
+            if (line.split("{").length === 2) {
+                is_in_block = true;
+                css_sorted.push(line);
+            }
+
+            // If ending line, sort current block and add them as sorted, and
+            // then add this line as sorted.
+            else if (line.split("}").length === 2) {
+
+                is_in_block = false;
+                const block_sorted = block.sort();
+                block = [];
+
+                // Store all non-empty rule lines.
+                block_sorted.forEach(rule => {
+                    if (rule.trim()) {
+                        css_sorted.push(rule);
+                    }
+                });
+
+                // Then add current ending line.
+                css_sorted.push(line);
+
+            }
+
+            // If in-block line, store in array to sort.
+            else if (is_in_block) {
+                block.push(line);
+            }
+
+            // Add line breaks, empty lines, and comments as sorted. (Ignore
+            // these, basically.)
+            else {
+                css_sorted.push(line);
+            }
+
+        });
+
+        return css_sorted;
+
+    }
+
+
+
     function sort_css() {
 
         clear_output();
@@ -289,67 +343,27 @@
         }
 
         const mode = get_mode(format);
-        if (!mode) {
-            console.log("Error: Mode not selected! Aborting.");
-            return;
+        if (format === "one") {
+            if (!mode) {
+                console.log("Error: Mode not selected! Aborting.");
+                return;
+            } else if (mode === "strict") {
+                console.log("Error: Strict mode functionality not added yet! Aborting.");
+                return;
+            }
         }
 
-        if (format === "one" && mode === "strict") {
-            console.log("Error: Strict node functionality not added yet! Aborting.");
-            return;
-        }
+        let css_sorted = [];
 
-        const css_sorted = [];
+        // Sorting mechanism for "pretty"-formated CSS.
+        if (format === "pretty") {
+            css_sorted = sort_pretty_formatted(lines);
+        }
 
         lines.forEach(line => {
 
-            // Sorting mechanism for "pretty"-formated CSS.
-            if (format === "pretty") {
-
-                let block = [];
-                let is_in_block = false;
-
-                // If starting line of block, add as sorted.
-                if (line.split("{").length === 2) {
-                    is_in_block = true;
-                    css_sorted.push(line);
-                }
-
-                // If ending line, sort current block and add them as sorted, and
-                // then add this line as sorted.
-                else if (line.split("}").length === 2) {
-
-                    is_in_block = false;
-                    const block_sorted = block.sort();
-                    block = [];
-
-                    // Store all non-empty rule lines.
-                    block_sorted.forEach(rule => {
-                        if (rule.trim()) {
-                            css_sorted.push(rule);
-                        }
-                    });
-
-                    // Then add current ending line.
-                    css_sorted.push(line);
-
-                }
-
-                // If in-block line, store in array to sort.
-                else if (is_in_block) {
-                    block.push(line);
-                }
-
-                // Add line breaks, empty lines, and comments as sorted. (Ignore
-                // these, basically.)
-                else {
-                    css_sorted.push(line);
-                }
-
-            }
-
             // Sorting mechanism for CSS with one-line rulesets (or blocks).
-            else if (format === "one") {
+            if (format === "one") {
 
                 const has_starting_cb = line.split("{").length === 2;
                 const has_ending_cb = line.split("}").length === 2;
