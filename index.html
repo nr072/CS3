@@ -183,7 +183,7 @@
     </div>
 
     <div class="footer-cont">
-        <span>v0.4.2</span>
+        <span>v0.4.3</span>
     </div>
 
 </body>
@@ -324,7 +324,7 @@
     // contains only one starting and one ending curly braces), split using
     // semicolons to separate rules, sort rules, and then join them to
     // recreate block.
-    function sort_one_formatted(line, css_sorted) {
+    function sort_one_formatted(line, css_sorted, mode) {
 
         // Line is considered a block if it contains only one of
         // starting and ending curly braces each.
@@ -369,13 +369,21 @@
 
         }
 
-        // Remove selectors (followed with commas), comments, partial
-        // blocks, and any other non-empty line.
+        // Based on mode, either abort execution or remove selectors
+        // (followed with commas), comments, partial blocks, and any other
+        // non-empty line.
         else {
-            console.log("Warning: Unacceptable line detected! Removing.");
+            if (mode === "strict") {
+                console.log("Error: Unacceptable line detected! Aborting.");
+                return [css_sorted, true];
+            } else if (mode === "lax") {
+                console.log("Warning: Unacceptable line detected! Removing.");
+            }
         }
 
-        return css_sorted;
+        // If "true", the second parameter tells execution to stop. This
+        // is used for Strict mode.
+        return [css_sorted, false];
 
     }
 
@@ -412,9 +420,6 @@
             if (!mode) {
                 console.log("Error: Mode not selected! Aborting.");
                 return;
-            } else if (mode === "strict") {
-                console.log("Error: Strict mode functionality not added yet! Aborting.");
-                return;
             }
         }
 
@@ -425,15 +430,23 @@
             css_sorted = sort_pretty_formatted(lines);
         }
 
-        // Sorting mechanism for CSS with one-line ruleset blocks.
-        if (format === "one") {
+        // The reason behind using "forEach" as opposed to a for-loop for
+        // this mode is "forEach" can not be broken out of. In Lax mode,
+        // the code needs to be executed for all lines, whereas in Strict
+        // mode, the execution will stop at the first unacceptable line.
+        else if (format === "one" && mode === "lax") {
+            lines.forEach(line => {
+                css_sorted = sort_one_formatted(line, css_sorted, mode);
+            });
+        }
 
-            if (mode === "lax") {
-                lines.forEach(line => {
-                    css_sorted = sort_one_formatted(line, css_sorted);
-                });
+        // Sort in Strict mode. Execution is aborted if any non-empty line
+        // that is not a complete block is found.
+        else if (format === "one" && mode === "strict") {
+            let stop = false;
+            for (let i = 0; i < lines.length && !stop; ++i) {
+                [css_sorted, stop] = sort_one_formatted(lines[i], css_sorted, mode);
             }
-
         }
 
         // Join all sorted lines, and show as output.
