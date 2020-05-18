@@ -183,7 +183,7 @@
     </div>
 
     <div class="footer-cont">
-        <span>v0.4.0</span>
+        <span>v0.4.1</span>
     </div>
 
 </body>
@@ -201,6 +201,7 @@
 
 
 
+    // Focus code input or output box.
     function focus_box(box_num) {
         const boxes = document.querySelectorAll(".box-cont .box");
         if (box_num === 1) {
@@ -263,6 +264,9 @@
 
 
 
+    // Split input on line breaks, take all lines between the two lines
+    // containing the starting and the ending burly braces, sort, and join
+    // to recreate ruleset block.
     function sort_pretty_formatted(lines) {
 
         const css_sorted = [];
@@ -316,63 +320,68 @@
 
 
 
+    // Take line if it is a complete block (determined by checking if line
+    // contains only one starting and one ending curly braces), split using
+    // semicolons to separate rules, sort rules, and then join them to
+    // recreate block.
     function sort_one_formatted(line, css_sorted) {
 
-                // Line is considered a block if it contains only one of
-                // starting and ending curly braces each.
-                const has_starting_cb = line.split("{").length === 2;
-                const has_ending_cb = line.split("}").length === 2;
-                const is_block = has_starting_cb && has_ending_cb;
+        // Line is considered a block if it contains only one of
+        // starting and ending curly braces each.
+        const has_starting_cb = line.split("{").length === 2;
+        const has_ending_cb = line.split("}").length === 2;
+        const is_block = has_starting_cb && has_ending_cb;
 
-                // Keep empty lines as is. They could be there for readability.
-                if (!line.trim()) {
-                    css_sorted.push(line);
-                }
+        // Keep empty lines as is. They could be there for readability.
+        if (!line.trim()) {
+            css_sorted.push(line);
+        }
 
-                // For complete, one-line blocks: Take rules, split using
-                // semicolons, sort, join, and recreate block.
-                else if (is_block) {
+        // For complete, one-line blocks: Take rules, split using
+        // semicolons, sort, join, and recreate block.
+        else if (is_block) {
 
-                    const selector = line.split("{")[0];
-                    const rules_line = line.split("{")[1].split("}")[0];
+            const selector = line.split("{")[0];
+            const rules_line = line.split("{")[1].split("}")[0];
 
-                    // Skip single-rule blocks.
-                    const rules = rules_line.split(";").filter(rule => rule.trim());
-                    const rules_sorted = rules.length === 1
-                        ? [rules[0]]
-                        : rules.length === 2
-                            ? (!rules[0].trim() || !rules[1].trim())
-                                ? [rules_line]
-                                : rules.sort()
-                            : rules.sort()
+            // Skip single-rule blocks.
+            const rules = rules_line.split(";").filter(rule => rule.trim());
+            const rules_sorted = rules.length === 1
+                ? [rules[0]]
+                : rules.length === 2
+                    ? (!rules[0].trim() || !rules[1].trim())
+                        ? [rules_line]
+                        : rules.sort()
+                    : rules.sort()
 
-                    // Recreate block with sorted rules (excluding empty array
-                    // item created due to the "split()" function, and trimmed
-                    // off of empty whitespaces since block is one-line), and
-                    // add the selector(s) and the wrapping curly braces.
-                    const block_sorted = selector + "{" +
-                        rules_sorted
-                            .filter(rule => rule.trim())
-                            .map(rule => rule.trim())
-                            .join(";") +
-                        ";}";
+            // Recreate block with sorted rules (excluding empty array
+            // item created due to the "split()" function, and trimmed
+            // off of empty whitespaces since block is one-line), and
+            // add the selector(s) and the wrapping curly braces.
+            const block_sorted = selector + "{" +
+                rules_sorted
+                    .filter(rule => rule.trim())
+                    .map(rule => rule.trim())
+                    .join("; ") +
+                ";}";
 
-                    css_sorted.push(block_sorted);
+            css_sorted.push(block_sorted);
 
-                }
+        }
 
-                // Remove selectors (followed with commas), comments, partial
-                // blocks, and any other non-empty line.
-                else {
-                    console.log("Warning: Unacceptable line detected! Removing.");
-                }
+        // Remove selectors (followed with commas), comments, partial
+        // blocks, and any other non-empty line.
+        else {
+            console.log("Warning: Unacceptable line detected! Removing.");
+        }
 
-                return css_sorted;
+        return css_sorted;
 
     }
 
 
 
+    // Take CSS code input, sort, and show as output.
     function sort_css() {
 
         clear_output();
