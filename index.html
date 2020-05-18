@@ -205,7 +205,7 @@
     </div>
 
     <div class="footer-cont">
-        <span>v0.4.5</span>
+        <span>v0.5.0</span>
     </div>
 
 </body>
@@ -517,6 +517,7 @@
         const out_table = turn_into_table(css_sorted);
         if (!out_table) {
             console.log("Error: Something unexpected happened! Aborting.");
+            return;
         }
         const out_field = document.getElementById("out");
         out_field.appendChild(out_table);
@@ -525,6 +526,7 @@
         const in_table = turn_into_table(lines);
         if (!in_table) {
             console.log("Error: Something unexpected happened! Aborting.");
+            return;
         }
         clear_box(1);
         in_field.appendChild(in_table);
