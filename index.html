@@ -53,6 +53,10 @@
             justify-content: space-between;
         }
 
+        .btn-cont {
+            text-align: right;
+        }
+
         .options-cont,
         .box-cont .box {
             margin: 20px 4vw;
@@ -189,7 +193,8 @@
                 </span>
             </span>
         </div>
-        <div>
+        <div class="btn-cont">
+            <span id="input_clear_btn" class="btn clear-btn">Clear input</span>
             <span id="sort_btn" class="btn sort-btn">Sort</span>
         </div>
     </div>
@@ -200,7 +205,7 @@
     </div>
 
     <div class="footer-cont">
-        <span>v0.4.4</span>
+        <span>v0.4.5</span>
     </div>
 
 </body>
@@ -215,6 +220,12 @@
 
     const sort_btn = document.getElementById("sort_btn");
     sort_btn.addEventListener("click", sort_css);
+
+    const input_clear_btn = document.getElementById("input_clear_btn");
+    input_clear_btn.addEventListener("click", function () {
+        clear_box(1);
+        focus_box(1);
+    });
 
 
 
