@@ -219,7 +219,7 @@
     </div>
 
     <div class="footer-cont">
-        <span>v0.6.2</span>
+        <span>v0.6.3</span>
     </div>
 
 </body>
@@ -262,6 +262,40 @@
     // Clear code input or output box.
     function clear_box(box_num) {
         document.getElementById(box_num === 1 ? "in" : "out").innerText = "";
+    }
+
+
+
+    // Show code as numbered rows.
+    function turn_into_table(code) {
+
+        if (!code || !code.length) {
+            return null;
+        }
+
+        const table = document.createElement("table");
+        table.className = "code";
+
+        // Create a number row for each line of code.
+        code.forEach((line, index) => {
+
+            const row = document.createElement("tr");
+            const cell_1 = document.createElement("td");
+            cell_1.className = "num";
+            const cell_2 = document.createElement("td");
+            cell_2.className = "code";
+
+            cell_1.innerText = index + 1;
+            cell_2.innerText = line;
+
+            row.appendChild(cell_1);
+            row.appendChild(cell_2);
+            table.appendChild(row);
+
+        });
+
+        return table;
+
     }
 
 
@@ -427,40 +461,6 @@
         // If "true", the second parameter tells execution to stop. This
         // is used for Strict mode.
         return mode === "strict" ? [css_sorted, false] : css_sorted;
-
-    }
-
-
-
-    // Show code as numbered rows.
-    function turn_into_table(code) {
-
-        if (!code || !code.length) {
-            return null;
-        }
-
-        const table = document.createElement("table");
-        table.className = "code";
-
-        // Create a number row for each line of code.
-        code.forEach((line, index) => {
-
-            const row = document.createElement("tr");
-            const cell_1 = document.createElement("td");
-            cell_1.className = "num";
-            const cell_2 = document.createElement("td");
-            cell_2.className = "code";
-
-            cell_1.innerText = index + 1;
-            cell_2.innerText = line;
-
-            row.appendChild(cell_1);
-            row.appendChild(cell_2);
-            table.appendChild(row);
-
-        });
-
-        return table;
 
     }
 
