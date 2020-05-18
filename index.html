@@ -123,6 +123,10 @@
             width: 46vw;
         }
 
+        .box-cont .box.no-focus {
+            border-color: transparent;
+        }
+
         .box-cont .box:focus {
             outline: none;
         }
@@ -219,7 +223,7 @@
     </div>
 
     <div class="footer-cont">
-        <span>v0.6.5</span>
+        <span>v0.6.6</span>
     </div>
 
 </body>
@@ -230,7 +234,7 @@
 
 "use strict";
 
-focus_box(1);
+focus_input(true);
 
 const sort_btn = document.getElementById("sort_btn");
 sort_btn.addEventListener("click", sort_css);
@@ -238,22 +242,33 @@ sort_btn.addEventListener("click", sort_css);
 const input_clear_btn = document.getElementById("input_clear_btn");
 input_clear_btn.addEventListener("click", function () {
     clear_box(1);
-    focus_box(1);
+    focus_input(true);
 });
 
 
 
-// Focus code input or output box.
-function focus_box(box_num) {
-    const boxes = document.querySelectorAll(".box-cont .box");
-    if (box_num === 1) {
-        boxes[0].focus();
-        boxes[0].classList.add("active");
-        boxes[1].classList.remove("active");
-    } else if (box_num === 2) {
-        boxes[0].blur();
-        boxes[0].classList.remove("active");
-        boxes[1].classList.add("active");
+// Focusing the input box means putting the cursor there, and showing its
+// border in a comparatively more prominent color.
+function focus_input(focus) {
+    const input = document.getElementById("in");
+    if (focus) {
+        input.focus();
+        input.classList.add("active");
+    } else {
+        input.blur();
+        input.classList.remove("active");
+    }
+}
+
+
+
+// Toggle code input or output box border.
+function toggle_box_border(box_num, show) {
+    const box = document.querySelectorAll(".box-cont .box")[box_num - 1];
+    if (show) {
+        box.classList.remove("no-focus");
+    } else {
+        box.classList.add("no-focus");
     }
 }
 
@@ -478,7 +493,7 @@ function sort_css() {
     const in_field = document.getElementById("in");
     const css = in_field.innerText;
     if (!css.trim()) {
-        focus_box(1);
+        focus_input(true);
         console.log("Error: Empty input! Aborting.");
         return;
     }
@@ -551,8 +566,10 @@ function sort_css() {
     // Scroll up to match sorted for easier side-by-side comparison.
     in_field.scrollTop = 0;
 
-    // Focus the output box.
-    focus_box(2);
+    // Remove focus from input, and remove both box borders.
+    focus_input(false);
+    toggle_box_border(1, false);
+    toggle_box_border(2, false);
 
 }
 
