@@ -183,7 +183,7 @@
     </div>
 
     <div class="footer-cont">
-        <span>v0.3.4</span>
+        <span>v0.4.0</span>
     </div>
 
 </body>
@@ -337,9 +337,9 @@
                     const rules_line = line.split("{")[1].split("}")[0];
 
                     // Skip single-rule blocks.
-                    const rules = rules_line.split(";");
+                    const rules = rules_line.split(";").filter(rule => rule.trim());
                     const rules_sorted = rules.length === 1
-                        ? [rules_line]
+                        ? [rules[0]]
                         : rules.length === 2
                             ? (!rules[0].trim() || !rules[1].trim())
                                 ? [rules_line]
