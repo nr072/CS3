@@ -183,7 +183,7 @@
     </div>
 
     <div class="footer-cont">
-        <span>v0.3.1</span>
+        <span>v0.3.2</span>
     </div>
 
 </body>
@@ -397,6 +397,7 @@
                     // the selector(s) and the wrapping curly braces.
                     const block_sorted = selector + "{" +
                         rules_sorted.filter(rule => rule).join(";") +
+                        ";" +
                         "}";
 
                     css_sorted.push(block_sorted);
