@@ -205,7 +205,7 @@
     </div>
 
     <div class="footer-cont">
-        <span>v0.5.0</span>
+        <span>v0.6.0</span>
     </div>
 
 </body>
@@ -412,7 +412,7 @@
 
         // If "true", the second parameter tells execution to stop. This
         // is used for Strict mode.
-        return [css_sorted, false];
+        return mode === "strict" ? [css_sorted, false] : css_sorted;
 
     }
 
